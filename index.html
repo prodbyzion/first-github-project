@@ -1,12 +1,764 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    My name is Amir!!!
-</body>
-</html>
+ <!DOCTYPE html>
+ <html lang="de">
+ <head>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Bonus Score-Board</title>
+     <style>
+         :root {
+             color-scheme: light dark;
+             font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+             --bg: #f3f4f6;
+             --card: #ffffffd9;
+             --border: #d1d5db;
+             --primary: #0d9488;
+             --primary-dark: #0f766e;
+             --warning: #b91c1c;
+             --text: #111827;
+         }
+ 
+         * {
+             box-sizing: border-box;
+         }
+ 
+         body {
+             margin: 0;
+             min-height: 100vh;
+             background: radial-gradient(circle at 20% 20%, #e0f2f1 0%, #f9fafb 45%, #e5e7eb 100%);
+             color: var(--text);
+         }
+ 
+         header {
+             padding: 2.5rem 1.5rem 1.5rem;
+             text-align: center;
+         }
+ 
+         header h1 {
+             margin: 0;
+             font-size: clamp(2.1rem, 5vw, 2.75rem);
+         }
+ 
+         header p {
+             margin: 0.35rem 0 0;
+             color: #4b5563;
+         }
+ 
+         main {
+             display: grid;
+             gap: 1.5rem;
+             grid-template-columns: minmax(260px, 340px) 1fr;
+             padding: 0 1.5rem 2.5rem;
+         }
+ 
+         @media (max-width: 980px) {
+             main {
+                 grid-template-columns: 1fr;
+             }
+         }
+ 
+         .card {
+             background: var(--card);
+             backdrop-filter: blur(8px);
+             border-radius: 18px;
+             border: 1px solid #ffffff40;
+             box-shadow: 0 24px 48px -32px rgba(15, 23, 42, 0.45);
+             padding: 1.5rem;
+         }
+ 
+         .card h2 {
+             margin-top: 0;
+             margin-bottom: 1rem;
+             font-size: 1.3rem;
+         }
+ 
+         label {
+             display: block;
+             font-weight: 600;
+             margin-bottom: 0.35rem;
+         }
+ 
+         select,
+         input,
+         button,
+         textarea {
+             font: inherit;
+         }
+ 
+         select,
+         input[type="text"],
+         input[type="number"] {
+             width: 100%;
+             padding: 0.55rem 0.65rem;
+             border-radius: 10px;
+             border: 1px solid var(--border);
+             background: rgba(255, 255, 255, 0.9);
+             color: inherit;
+             transition: border-color 0.2s ease, box-shadow 0.2s ease;
+         }
+ 
+         select:focus,
+         input:focus,
+         textarea:focus {
+             outline: none;
+             border-color: var(--primary);
+             box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.2);
+         }
+ 
+         .field {
+             margin-bottom: 1rem;
+         }
+ 
+         .actions {
+             display: flex;
+             flex-wrap: wrap;
+             gap: 0.75rem;
+             margin-top: 1rem;
+         }
+ 
+         button {
+             border: none;
+             border-radius: 999px;
+             padding: 0.6rem 1.25rem;
+             cursor: pointer;
+             display: inline-flex;
+             align-items: center;
+             gap: 0.4rem;
+             font-weight: 600;
+             transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+         }
+ 
+         button.primary {
+             background: linear-gradient(135deg, var(--primary), #14b8a6);
+             color: white;
+         }
+ 
+         button.primary:hover {
+             transform: translateY(-1px);
+             box-shadow: 0 16px 30px -18px rgba(13, 148, 136, 0.7);
+         }
+ 
+         button.secondary {
+             background: rgba(15, 23, 42, 0.06);
+             color: inherit;
+         }
+ 
+         button.secondary:hover {
+             transform: translateY(-1px);
+             background: rgba(15, 23, 42, 0.12);
+         }
+ 
+         button.danger {
+             background: rgba(185, 28, 28, 0.12);
+             color: #991b1b;
+         }
+ 
+         button.danger:hover {
+             background: rgba(185, 28, 28, 0.18);
+         }
+ 
+         button svg {
+             width: 1.05rem;
+             height: 1.05rem;
+         }
+ 
+         table {
+             width: 100%;
+             border-collapse: collapse;
+             border-radius: 16px;
+             overflow: hidden;
+         }
+ 
+         thead {
+             background: rgba(15, 23, 42, 0.9);
+             color: white;
+         }
+ 
+         th,
+         td {
+             padding: 0.75rem;
+             border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+             text-align: left;
+             vertical-align: top;
+         }
+ 
+         tbody tr:nth-child(even) {
+             background: rgba(15, 23, 42, 0.03);
+         }
+ 
+         tbody tr:hover {
+             background: rgba(13, 148, 136, 0.08);
+         }
+ 
+         tbody td input {
+             width: 100%;
+             border: none;
+             background: transparent;
+             padding: 0;
+         }
+ 
+         tbody td input:focus {
+             outline: none;
+             box-shadow: inset 0 -2px 0 0 rgba(13, 148, 136, 0.6);
+         }
+ 
+         .status {
+             margin-top: 1rem;
+             padding: 0.85rem 1rem;
+             border-radius: 12px;
+             border: 1px solid rgba(15, 23, 42, 0.12);
+             background: rgba(13, 148, 136, 0.08);
+             color: #0f5132;
+             display: none;
+         }
+ 
+         .status.error {
+             background: rgba(185, 28, 28, 0.12);
+             color: #7f1d1d;
+         }
+ 
+         .section-title {
+             margin: 2rem 0 0.75rem;
+             font-size: 1.15rem;
+             font-weight: 600;
+         }
+ 
+         #datasetPreview {
+             width: 100%;
+             min-height: 160px;
+             border-radius: 12px;
+             border: 1px dashed rgba(148, 163, 184, 0.6);
+             background: rgba(15, 23, 42, 0.03);
+             padding: 1rem;
+             font-family: "Fira Code", "SFMono-Regular", ui-monospace, monospace;
+             font-size: 0.85rem;
+             white-space: pre-wrap;
+             word-break: break-word;
+             color: #334155;
+         }
+ 
+         .employee-summary {
+             display: grid;
+             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+             gap: 0.65rem;
+             margin-bottom: 0.85rem;
+         }
+ 
+         .employee-summary span {
+             display: inline-flex;
+             align-items: center;
+             gap: 0.35rem;
+             background: rgba(15, 23, 42, 0.05);
+             border-radius: 999px;
+             padding: 0.35rem 0.8rem;
+             font-size: 0.92rem;
+         }
+ 
+         .tag {
+             background: rgba(13, 148, 136, 0.12);
+             color: #0f766e;
+             border-radius: 999px;
+             padding: 0.25rem 0.7rem;
+             display: inline-flex;
+             align-items: center;
+             gap: 0.4rem;
+         }
+ 
+         footer {
+             text-align: center;
+             padding: 1rem;
+             color: #6b7280;
+             font-size: 0.85rem;
+         }
+ 
+         @media print {
+             body {
+                 background: white;
+             }
+             header, .actions.secondary-only, footer, #datasetPreview {
+                 display: none !important;
+             }
+             main {
+                 padding: 0;
+             }
+             .card {
+                 box-shadow: none;
+                 border: 1px solid #e2e8f0;
+             }
+         }
+     </style>
+ </head>
+ <body>
+ <header>
+     <h1>Bonus Score-Board</h1>
+     <p>Verwalten Sie Bonus-Daten strukturiert, schnell und ohne Excel-Makros.</p>
+ </header>
+ <main>
+     <section class="card" aria-labelledby="config-heading">
+         <h2 id="config-heading">Einstellungen</h2>
+         <div class="field">
+             <label for="personalNumber">Personalnummer</label>
+             <select id="personalNumber"></select>
+         </div>
+         <div class="field">
+             <label for="month">Monat</label>
+             <select id="month"></select>
+         </div>
+         <div class="employee-summary" id="employeeSummary" aria-live="polite"></div>
+         <div class="actions">
+             <button class="primary" id="updateBtn" type="button" title="Aktualisiert das Score-Board mit den ausgewählten Daten">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0114.13-3.36L23 10M1 14l5.36 4.36A9 9 0 0020.49 15"></path></svg>
+                 Score-Board aktualisieren
+             </button>
+             <button class="secondary" id="saveBtn" type="button">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                 Monat speichern
+             </button>
+             <button class="secondary" id="previewBtn" type="button">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M21 12c-1.8 3.333-4.8 5-9 5s-7.2-1.667-9-5c1.8-3.333 4.8-5 9-5s7.2 1.667 9 5z"></path></svg>
+                 PDF Vorschau
+             </button>
+             <button class="danger" id="resetBtn" type="button">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path></svg>
+                 Score-Board zurücksetzen
+             </button>
+         </div>
+         <p class="section-title">Mitarbeiter hinzufügen</p>
+         <form id="createEmployeeForm">
+             <div class="field">
+                 <label for="newPersonal">Personalnummer</label>
+                 <input id="newPersonal" type="text" placeholder="z. B. 4711" required>
+             </div>
+             <div class="field">
+                 <label for="newName">Name</label>
+                 <input id="newName" type="text" placeholder="Vorname Nachname" required>
+             </div>
+             <div class="field">
+                 <label for="newRole">Funktion (optional)</label>
+                 <input id="newRole" type="text" placeholder="Teamleitung" />
+             </div>
+             <button class="secondary" type="submit">Mitarbeiter anlegen</button>
+         </form>
+         <div class="status" id="status" role="status"></div>
+     </section>
+     <section class="card" aria-labelledby="score-heading">
+         <h2 id="score-heading">Score-Board</h2>
+         <div class="tag" id="scoreMeta">Keine Auswahl</div>
+         <div class="table-wrapper">
+             <table>
+                 <thead>
+                 <tr>
+                     <th style="width:3rem">#</th>
+                     <th>Kennzahl</th>
+                     <th>Beschreibung</th>
+                     <th>Ziel</th>
+                     <th>Wert</th>
+                     <th>Gewichtung</th>
+                     <th>Score</th>
+                 </tr>
+                 </thead>
+                 <tbody id="scoreTableBody"></tbody>
+             </table>
+         </div>
+         <p class="section-title">Datenvorschau (JSON)</p>
+         <pre id="datasetPreview"></pre>
+     </section>
+ </main>
+ <footer>
+     Erstellt als moderne Alternative zu VBA-Makros. Alle Daten bleiben im Browser (localStorage).
+ </footer>
+ <script>
+ (() => {
+     // Hier kannst du die monatliche Auswahl anpassen. "short" entspricht dem Dropdown-Kürzel,
+     // "full" muss mit den Schlüsseln in defaultData[<personalnummer>].months übereinstimmen.
+     const MONTHS = [
+         { short: "Jan", full: "Januar" },
+         { short: "Feb", full: "Februar" },
+         { short: "Mrz", full: "März" },
+         { short: "Apr", full: "April" },
+         { short: "Mai", full: "Mai" },
+         { short: "Jun", full: "Juni" },
+         { short: "Jul", full: "Juli" },
+         { short: "Aug", full: "August" },
+         { short: "Sep", full: "September" },
+         { short: "Okt", full: "Oktober" },
+         { short: "Nov", full: "November" },
+         { short: "Dez", full: "Dezember" },
+     ];
+ 
+     const STORAGE_KEY = "bonus-scoreboard";
+ 
+     // Ausgangsdaten für alle Personalnummern. Ergänze oder ändere hier deine Mitarbeitenden.
+     // Jede Personalnummer (z. B. "1001") erhält Name, Rolle und Monatsdaten.
+     const defaultData = {
+         "1001": {
+             name: "Anna Muster",
+             role: "Leitung Versand",
+             months: {
+                 "Januar": sampleRows({
+                     bonuspool: "15%",
+                     punctuality: 98,
+                     quality: 92,
+                     complaints: 4,
+                 }),
+                 "Februar": sampleRows({
+                     bonuspool: "15%",
+                     punctuality: 95,
+                     quality: 94,
+                     complaints: 2,
+                 }),
+             },
+         },
+         "2007": {
+             name: "Marco Frei",
+             role: "Teamleiter Logistik",
+             months: {
+                 "Januar": sampleRows({
+                     bonuspool: "12%",
+                     punctuality: 91,
+                     quality: 89,
+                     complaints: 7,
+                 }),
+             },
+         },
+         "3055": {
+             name: "Mira Singh",
+             role: "Customer Service",
+             months: {
+                 "März": sampleRows({
+                     bonuspool: "10%",
+                     punctuality: 97,
+                     quality: 96,
+                     complaints: 1,
+                 }),
+             },
+         },
+     };
+ 
+     let dataset = loadDataset();
+ 
+     const el = {
+         personalNumber: document.querySelector("#personalNumber"),
+         month: document.querySelector("#month"),
+         status: document.querySelector("#status"),
+         scoreTableBody: document.querySelector("#scoreTableBody"),
+         datasetPreview: document.querySelector("#datasetPreview"),
+         employeeSummary: document.querySelector("#employeeSummary"),
+         scoreMeta: document.querySelector("#scoreMeta"),
+         createForm: document.querySelector("#createEmployeeForm"),
+     };
+ 
+     document.querySelector("#updateBtn").addEventListener("click", handleUpdate);
+     document.querySelector("#resetBtn").addEventListener("click", handleReset);
+     document.querySelector("#saveBtn").addEventListener("click", handleSave);
+     document.querySelector("#previewBtn").addEventListener("click", handlePreview);
+     el.personalNumber.addEventListener("change", handleEmployeeChange);
+     el.month.addEventListener("change", updateScoreMeta);
+     el.createForm.addEventListener("submit", handleCreateEmployee);
+ 
+     initEmployeeSelect();
+     initMonthSelect();
+     renderDatasetPreview();
+     renderEmptyTable();
+ 
+     function sampleRows({ bonuspool, punctuality, quality, complaints }) {
+         const rows = [
+             {
+                 label: "Bonus-Pool",
+                 description: "Verfügbarer Bonus-Pool für den Monat",
+                 target: bonuspool,
+                 value: bonuspool,
+                 weight: "0.15",
+                 score: ""
+             },
+             {
+                 label: "Pünktlichkeit",
+                 description: "On-Time-Delivery in %",
+                 target: "95%",
+                 value: `${punctuality}%`,
+                 weight: "0.25",
+                 score: (punctuality * 0.25).toFixed(2)
+             },
+             {
+                 label: "Qualität",
+                 description: "Qualitätsquote",
+                 target: "93%",
+                 value: `${quality}%`,
+                 weight: "0.25",
+                 score: (quality * 0.25).toFixed(2)
+             },
+             {
+                 label: "Reklamationen",
+                 description: "Anzahl Kundenreklamationen",
+                 target: "≤ 5",
+                 value: complaints,
+                 weight: "0.15",
+                 score: complaints <= 5 ? "15" : "10"
+             },
+             {
+                 label: "Team-Feedback",
+                 description: "Durchschnittliche Bewertung der Teamzufriedenheit",
+                 target: "≥ 4.2",
+                 value: "4.3",
+                 weight: "0.10",
+                 score: "12"
+             },
+             {
+                 label: "Sonderprojekte",
+                 description: "Abgeschlossene Sonderprojekte",
+                 target: "1",
+                 value: "1",
+                 weight: "0.10",
+                 score: "10"
+             },
+         ];
+         while (rows.length < 12) {
+             rows.push({
+                 label: "",
+                 description: "",
+                 target: "",
+                 value: "",
+                 weight: "",
+                 score: "",
+             });
+         }
+         return rows;
+     }
+ 
+     function loadDataset() {
+         try {
+             const raw = window.localStorage.getItem(STORAGE_KEY);
+             if (!raw) return structuredClone(defaultData);
+             const parsed = JSON.parse(raw);
+             return Object.keys(parsed).length ? parsed : structuredClone(defaultData);
+         } catch (err) {
+             console.warn("Konnte gespeicherte Daten nicht laden", err);
+             return structuredClone(defaultData);
+         }
+     }
+ 
+     function persistDataset() {
+         try {
+             window.localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+         } catch (err) {
+             console.error("Konnte Dataset nicht speichern", err);
+         }
+         renderDatasetPreview();
+     }
+ 
+     function initEmployeeSelect() {
+         el.personalNumber.innerHTML = "";
+         const placeholder = new Option("Bitte wählen…", "", true, false);
+         placeholder.disabled = true;
+         el.personalNumber.add(placeholder);
+         Object.entries(dataset)
+             .sort(([a], [b]) => a.localeCompare(b))
+             .forEach(([id, info]) => {
+                 const opt = new Option(`${id} – ${info.name}`, id);
+                 el.personalNumber.add(opt);
+             });
+     }
+ 
+     function initMonthSelect() {
+         el.month.innerHTML = "";
+         const placeholder = new Option("Bitte wählen…", "", true, false);
+         placeholder.disabled = true;
+         el.month.add(placeholder);
+ 
+         const current = new Date();
+         const currentIndex = current.getMonth();
+ 
+         MONTHS.forEach((month, index) => {
+             const opt = new Option(`${month.full} (${month.short})`, month.full, false, index === currentIndex);
+             el.month.add(opt);
+         });
+ 
+         updateScoreMeta();
+     }
+ 
+     function handleUpdate() {
+         const id = el.personalNumber.value;
+         const month = el.month.value;
+         if (!id) {
+             return showStatus("Bitte zuerst eine Personalnummer auswählen.", true);
+         }
+         if (!month) {
+             return showStatus("Bitte einen Monat auswählen.", true);
+         }
+         const employee = dataset[id];
+         if (!employee) {
+             return showStatus(`Keine Daten für ${id} hinterlegt.`, true);
+         }
+         const rows = employee.months?.[month];
+         if (!rows) {
+             renderEmptyTable();
+             showStatus(`Für ${employee.name} existieren keine Daten für ${month}.`, true);
+             updateScoreMeta();
+             return;
+         }
+         renderRows(rows);
+         showStatus(`Score-Board von ${employee.name} für ${month} geladen.`, false);
+         updateScoreMeta();
+     }
+ 
+     function handleReset() {
+         renderEmptyTable();
+         showStatus("Score-Board wurde geleert.", false);
+     }
+ 
+     function handleSave() {
+         const id = el.personalNumber.value;
+         const month = el.month.value;
+         if (!id || !month) {
+             return showStatus("Personalnummer und Monat auswählen, bevor gespeichert werden kann.", true);
+         }
+         const rows = readRows();
+         if (!dataset[id]) {
+             dataset[id] = { name: "", role: "", months: {} };
+         }
+         if (!dataset[id].months) dataset[id].months = {};
+         dataset[id].months[month] = rows;
+         persistDataset();
+         showStatus(`Daten für ${id} · ${month} gespeichert.`, false);
+     }
+ 
+     function handlePreview() {
+         window.print();
+     }
+ 
+     function readRows() {
+         const rows = [];
+         const trList = Array.from(el.scoreTableBody.querySelectorAll("tr"));
+         trList.forEach(tr => {
+             const cells = tr.querySelectorAll("input");
+             rows.push({
+                 label: cells[0].value.trim(),
+                 description: cells[1].value.trim(),
+                 target: cells[2].value.trim(),
+                 value: cells[3].value.trim(),
+                 weight: cells[4].value.trim(),
+                 score: cells[5].value.trim(),
+             });
+         });
+         return rows;
+     }
+ 
+     function renderRows(rows = []) {
+         el.scoreTableBody.innerHTML = "";
+         const totalRows = Math.max(rows.length, 12);
+         for (let i = 0; i < totalRows; i  ) {
+             const row = rows[i] || {};
+             const tr = document.createElement("tr");
+             tr.innerHTML = `
+                 <td>${String(i   1).padStart(2, "0")}</td>
+                 <td><input type="text" value="${escapeHtml(row.label || "")}"></td>
+                 <td><input type="text" value="${escapeHtml(row.description || "")}"></td>
+                 <td><input type="text" value="${escapeHtml(row.target || "")}"></td>
+                 <td><input type="text" value="${escapeHtml(row.value || "")}"></td>
+                 <td><input type="text" value="${escapeHtml(row.weight || "")}"></td>
+                 <td><input type="text" value="${escapeHtml(row.score || "")}"></td>
+             `;
+             el.scoreTableBody.append(tr);
+         }
+     }
+ 
+     function renderEmptyTable() {
+         renderRows(new Array(12).fill({}));
+     }
+ 
+     function showStatus(message, isError = false) {
+         el.status.textContent = message;
+         el.status.classList.toggle("error", Boolean(isError));
+         el.status.style.display = "block";
+         if (!isError) {
+             setTimeout(() => {
+                 el.status.style.display = "none";
+             }, 3500);
+         }
+     }
+ 
+     function renderDatasetPreview() {
+         el.datasetPreview.textContent = JSON.stringify(dataset, null, 2);
+     }
+ 
+     function updateScoreMeta() {
+         const id = el.personalNumber.value;
+         const month = el.month.value;
+         if (id && month && dataset[id]) {
+             el.scoreMeta.textContent = `${month} · ${dataset[id].name ?? "Unbekannt"}`;
+         } else if (id && dataset[id]) {
+             el.scoreMeta.textContent = `${dataset[id].name ?? "Unbekannt"}`;
+         } else {
+             el.scoreMeta.textContent = "Keine Auswahl";
+         }
+         renderEmployeeSummary();
+     }
+ 
+     function handleEmployeeChange() {
+         updateScoreMeta();
+         const id = el.personalNumber.value;
+         if (!id) {
+             el.month.value = "";
+             renderEmployeeSummary();
+             return;
+         }
+         const employee = dataset[id];
+         if (!employee) return;
+         const months = Object.keys(employee.months ?? {});
+         if (months.length && !months.includes(el.month.value)) {
+             el.month.value = months[0];
+         }
+         updateScoreMeta();
+     }
+ 
+     function renderEmployeeSummary() {
+         const id = el.personalNumber.value;
+         const summary = el.employeeSummary;
+         summary.innerHTML = "";
+         if (!id || !dataset[id]) return;
+         const info = dataset[id];
+         const spanName = document.createElement("span");
+         spanName.textContent = info.name || "Ohne Namen";
+         summary.append(spanName);
+         if (info.role) {
+             const spanRole = document.createElement("span");
+             spanRole.textContent = info.role;
+             summary.append(spanRole);
+         }
+         const months = Object.keys(info.months ?? {}).length;
+         const spanMonths = document.createElement("span");
+         spanMonths.textContent = `${months} gespeicherte Monat(e)`;
+         summary.append(spanMonths);
+     }
+ 
+     function handleCreateEmployee(event) {
+         event.preventDefault();
+         const personal = document.querySelector("#newPersonal").value.trim();
+         const name = document.querySelector("#newName").value.trim();
+         const role = document.querySelector("#newRole").value.trim();
+         if (!personal || !name) {
+             return showStatus("Personalnummer und Name sind Pflichtfelder.", true);
+         }
+         if (dataset[personal]) {
+             return showStatus("Diese Personalnummer existiert bereits.", true);
+         }
+         dataset[personal] = { name, role, months: {} };
+         persistDataset();
+         initEmployeeSelect();
+         el.personalNumber.value = personal;
+         updateScoreMeta();
+         event.target.reset();
+         showStatus(`Mitarbeiter ${name} wurde angelegt.`, false);
+     }
+ 
+     function escapeHtml(value) {
+         return String(value)
+             .replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
+     }
+ })();
+ </script>
+ </body>
+ </html>
